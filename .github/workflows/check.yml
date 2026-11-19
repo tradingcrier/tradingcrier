@@ -1,0 +1,22 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Validate JSON and rebuilt index
+        run: |
+          set -e
+          for f in *.json; do python -m json.tool "$f" > /dev/null; done
+          python build_catalog.py --repo "${{ github.repository }}" --branch main
+          # Падает, если спеку поменяли, а catalog.json не пересобрали
+          # (sha256 или url разъехались).
+          git diff --exit-code catalog.json
