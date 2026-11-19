@@ -1,0 +1,4 @@
+# sha256 в catalog.json считается по LF-байтам — фиксируем окончания строк,
+# чтобы GitHub отдавал именно их независимо от autocrlf у коммитящего.
+*.json text eol=lf
+*.md   text eol=lf

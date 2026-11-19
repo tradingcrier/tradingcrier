@@ -1,0 +1,92 @@
+{
+  "schema": "tradingcrier.source/2",
+  "name": "Биржевые данные (с задержкой)",
+  "version": "1.0.0",
+  "minEngine": "1.3.0",
+  "capabilities": { "candles": true, "quotes": "rest", "stream": false, "instruments": true },
+  "identity": { "userAgentField": "", "appNameField": "", "requiresAppName": [] },
+  "environments": {},
+  "plugin": "",
+  "baseUrl": "https://iss.moex.com/iss",
+  "secrets": [],
+  "auth": { "type": "none" },
+  "headers": {},
+  "timeframes": { "m1": "1", "m5": "", "m15": "", "h1": "60", "h4": "", "d1": "24" },
+  "candles": {
+    "request": {
+      "method": "GET",
+      "path": "/engines/stock/markets/shares/boards/TQBR/securities/{{symbol}}/candles.json",
+      "query": {
+        "interval": "{{interval}}",
+        "from": "{{from:date}}",
+        "iss.meta": "off",
+        "iss.only": "candles"
+      }
+    },
+    "window": { "mode": "range", "sessionFactor": 3, "maxCandles": 500 },
+    "pagination": { "type": "offset", "offsetParam": "start", "maxPages": 10 },
+    "response": {
+      "itemsPath": "candles.data",
+      "rowFormat": "columnar",
+      "columnsPath": "candles.columns",
+      "fields": { "time": "begin", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume" },
+      "time": { "format": "pattern", "pattern": "yyyy-MM-dd HH:mm:ss", "utcOffset": "+03:00" },
+      "price": { "format": "raw" }
+    }
+  },
+  "ticker": {
+    "mode": "request",
+    "request": {
+      "method": "GET",
+      "path": "/engines/stock/markets/shares/boards/TQBR/securities/{{symbol}}.json",
+      "query": { "iss.meta": "off", "iss.only": "marketdata", "marketdata.columns": "LAST,LASTTOPREVPRICE" }
+    },
+    "response": { "itemPath": "marketdata.data.0", "columnsPath": "marketdata.columns", "lastPrice": "LAST", "changePct": "LASTTOPREVPRICE" }
+  },
+  "tickers": {
+    "request": {
+      "method": "GET",
+      "path": "/engines/stock/markets/shares/boards/TQBR/securities.json",
+      "query": {
+        "iss.meta": "off",
+        "iss.only": "marketdata",
+        "marketdata.columns": "SECID,LAST,LASTTOPREVPRICE,VALTODAY,HIGH,LOW"
+      }
+    },
+    "response": {
+      "itemsPath": "marketdata.data",
+      "columnsPath": "marketdata.columns",
+      "fields": {
+        "symbol": "SECID", "lastPrice": "LAST", "changePct": "LASTTOPREVPRICE",
+        "prevClose": "", "volume24h": "VALTODAY", "high24h": "HIGH", "low24h": "LOW"
+      }
+    }
+  },
+  "instruments": {
+    "request": {
+      "method": "GET",
+      "path": "/engines/stock/markets/shares/boards/TQBR/securities.json",
+      "query": {
+        "iss.meta": "off",
+        "iss.only": "securities",
+        "securities.columns": "SECID,SHORTNAME,ISIN,LOTSIZE,CURRENCYID"
+      }
+    },
+    "response": {
+      "itemsPath": "securities.data",
+      "columnsPath": "securities.columns",
+      "fields": {
+        "symbol": "SECID", "name": "SHORTNAME", "isin": "ISIN", "figi": "",
+        "type": "", "lot": "LOTSIZE", "currency": "CURRENCYID"
+      }
+    },
+    "refreshPolicy": "daily",
+    "items": []
+  },
+  "errors": { "okPath": "", "okValues": [] },
+  "limits": {
+    "minIntervalMs": 300,
+    "maxConcurrent": 2,
+    "retry": { "maxAttempts": 2, "baseDelayMs": 500, "factor": 2 }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "tradingcrier.source/2",
+  "name": "Мой брокер",
+  "version": "1.0.0",
+  "minEngine": "1.3.0",
+  "capabilities": { "candles": true, "quotes": "rest", "stream": false, "instruments": true },
+  "identity": {
+    "userAgentField": "",
+    "appNameField": "appname",
+    "appNameHeader": "x-app-name",
+    "requiresAppName": ["sandbox"]
+  },
+  "environments": {
+    "prod": { "baseUrl": "https://invest-public-api.tbank.ru/rest" },
+    "sandbox": { "baseUrl": "https://sandbox-invest-public-api.tbank.ru/rest" }
+  },
+  "plugin": "",
+  "baseUrl": "https://invest-public-api.tbank.ru/rest",
+  "secrets": [
+    { "key": "token", "label": "Токен только для чтения" },
+    { "key": "appname", "label": "Название приложения (своя метка)" }
+  ],
+  "auth": {
+    "type": "header",
+    "header": { "name": "Authorization", "value": "Bearer {{secret:token}}" }
+  },
+  "headers": { "Content-Type": "application/json" },
+  "timeframes": {
+    "m1": "CANDLE_INTERVAL_1_MIN", "m5": "CANDLE_INTERVAL_5_MIN", "m15": "CANDLE_INTERVAL_15_MIN",
+    "h1": "CANDLE_INTERVAL_HOUR", "h4": "CANDLE_INTERVAL_4_HOUR", "d1": "CANDLE_INTERVAL_DAY"
+  },
+  "candles": {
+    "request": {
+      "method": "POST",
+      "path": "/tinkoff.public.invest.api.contract.v1.MarketDataService/GetCandles",
+      "bodyType": "json",
+      "body": {
+        "instrumentId": "{{symbol:raw}}",
+        "from": "{{from:iso}}",
+        "to": "{{to:iso}}",
+        "interval": "{{interval}}"
+      }
+    },
+    "window": { "mode": "range", "sessionFactor": 3, "maxCandles": 2400 },
+    "pagination": { "type": "none" },
+    "response": {
+      "itemsPath": "candles",
+      "rowFormat": "object",
+      "fields": { "time": "time", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume" },
+      "time": { "format": "iso8601" },
+      "price": { "format": "units_nano" }
+    }
+  },
+  "ticker": {
+    "mode": "request",
+    "request": {
+      "method": "POST",
+      "path": "/tinkoff.public.invest.api.contract.v1.MarketDataService/GetLastPrices",
+      "bodyType": "json",
+      "body": { "instrumentId": ["{{symbol:raw}}"] }
+    },
+    "response": { "itemPath": "lastPrices.0", "lastPrice": "price" }
+  },
+  "instruments": {
+    "request": {
+      "method": "POST",
+      "path": "/tinkoff.public.invest.api.contract.v1.InstrumentsService/Shares",
+      "bodyType": "json",
+      "body": { "instrumentStatus": "INSTRUMENT_STATUS_BASE" }
+    },
+    "response": {
+      "itemsPath": "instruments",
+      "fields": {
+        "symbol": "figi", "name": "name", "isin": "isin", "figi": "figi",
+        "type": "", "lot": "lot", "currency": "currency", "board": "classCode"
+      }
+    },
+    "refreshPolicy": "weekly",
+    "items": []
+  },
+  "errors": { "okPath": "", "okValues": [] },
+  "limits": {
+    "minIntervalMs": 250,
+    "maxConcurrent": 2,
+    "retry": { "maxAttempts": 3, "baseDelayMs": 500, "factor": 2 }
+  }
+}
