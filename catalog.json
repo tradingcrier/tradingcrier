@@ -3,9 +3,9 @@
   "specs": [
     {
       "name": "Мой брокер",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "url": "https://raw.githubusercontent.com/tradingcrier/tradingcrier/main/broker_rest_v2.json",
-      "sha256": "ac5628d63047bd61cf44ec56d87f158d84afb07016980c623084d37c1e1305b4",
+      "sha256": "ada69687ec1aadc118cf6406a698a88c235e4ecb9a8bfdc501e4e2f94c52d2a3",
       "minEngine": "1.3.0",
       "summary": "REST API брокера: акции, свечи и котировки без задержки. Нужен токен «только чтение»."
     },

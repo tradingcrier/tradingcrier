@@ -1,7 +1,7 @@
 {
   "schema": "tradingcrier.source/2",
   "name": "Мой брокер",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minEngine": "1.3.0",
   "capabilities": { "candles": true, "quotes": "rest", "stream": false, "instruments": true },
   "identity": {
@@ -38,7 +38,8 @@
         "instrumentId": "{{symbol:raw}}",
         "from": "{{from:iso}}",
         "to": "{{to:iso}}",
-        "interval": "{{interval}}"
+        "interval": "{{interval}}",
+        "limit": "{{limit:int}}"
       }
     },
     "window": { "mode": "range", "sessionFactor": 3, "maxCandles": 2400 },

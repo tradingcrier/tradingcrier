@@ -56,12 +56,13 @@
 - Символ: `instrumentId` — FIGI, `instrument_uid` или `ТИКЕР_КЛАСС` (например `SBER_TQBR`).
 - Цены приходят как `Quotation {units, nano}` — разбираются автоматически.
 - Изменения за день в ответе нет — считается из дневных свечей.
+- `limit` в теле `GetCandles` обязателен: без него API ограничивает длину периода `from..to` (для 4ч окно на 300 свечей уже не проходит — HTTP 400, код `30014`). С `limit` API отдаёт последние N свечей окна.
 
 ```json
 {
   "schema": "tradingcrier.source/2",
   "name": "Мой брокер",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minEngine": "1.3.0",
   "capabilities": { "candles": true, "quotes": "rest", "stream": false, "instruments": true },
   "identity": {
@@ -98,7 +99,8 @@
         "instrumentId": "{{symbol:raw}}",
         "from": "{{from:iso}}",
         "to": "{{to:iso}}",
-        "interval": "{{interval}}"
+        "interval": "{{interval}}",
+        "limit": "{{limit:int}}"
       }
     },
     "window": { "mode": "range", "sessionFactor": 3, "maxCandles": 2400 },
